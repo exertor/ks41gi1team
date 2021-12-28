@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ksmart41.mybatis.mapper.MemberMapper">
+	<resultMap type="Member" id="memberResultMap">
+		<result column="m_id" property="memberId"/>
+		<result column="m_pw" property="memberPw"/>
+		<result column="m_name" property="memberName"/>
+		<result column="m_level" property="memberLevel"/>
+		<result column="m_email" property="memberEmail"/>
+		<result column="m_addr" property="memberAddr"/>
+		<result column="m_reg_date" property="memberRegDate"/>
+	</resultMap>
+	
+	<update id="modifyMemberInfo" parameterType="Member">
+		UPDATE
+			 tb_member
+		<trim prefix="SET" prefixOverrides=",">  <!--prefixOverrides: 앞에 있는 ,값을 지워주고 실행해준다. suffixOverrides : 뒤에 있는 ,값을 지워주고 실행해준다.  -->
+			<if test="memberPw != null and memberPw != ''.toString()">
+				m_pw =	#{memberPw}			
+			</if>
+			<if test="memberLevel != null and memberLevel != ''.toString()">
+				,m_level=	#{memberLevel}
+			</if>
+			<if test="memberName != null and memberName != ''.toString()">
+				,m_name=	#{memberName}
+			</if>
+			<if test="memberEmail != null and memberEmail != ''.toString()">
+				,m_email=	#{memberEmail}
+			</if>
+			<if test="memberAddr != null and memberAddr != ''.toString()">
+				,m_addr=	#{memberAddr}
+			</if>
+		</trim>	 
+		WHERE 
+			m_id=#{memberId};	
+	</update>
+	
+	<delete id="removeMemberByMemberId" parameterType="String">
+		delete
+			m
+		from
+			tb_member as m
+		where 
+			m.m_id=#{memberId};
+	</delete>
+	
+	<delete id="removeLoginHistory" parameterType="String">
+		delete
+			l
+		from
+			tb_login as l 
+		where 
+			l.login_id=#{memberId};
+	</delete>
+	
+	<delete id="removeGoodsBySellerId" parameterType="String">
+		delete
+			g
+		from
+			tb_goods as g
+		where 
+			g.g_seller_id=#{memberId};	
+	</delete>
+	
+	<delete id="removeOrderByOrderId" parameterType="String">
+		delete
+			o
+		from
+			tb_order as o
+		where 
+			o.o_id=#{memberId};	
+	</delete>
+	
+	<!-- id는 메서드명 매개변수가 String이기에 파라미터타입도 String  -->
+	<delete id="removeOrderBySellerId" parameterType="String">
+		delete
+			o
+		from
+			tb_order as o
+			inner join
+			tb_goods as g
+			on
+			g.g_code=o.o_g_code
+		where 
+			g.g_seller_id = #{memberId};
+	</delete>
+	
+	<select id="getMemberInfoByMemberId" parameterType="String" resultMap="memberResultMap">
+		select
+			m.m_id
+			,m.m_pw
+			,m.m_name
+			,m.m_level
+			,m.m_email
+			,m.m_addr
+		from
+			tb_member as m
+		where
+			m.m_id=#{memberId};
+		<trim prefix="WHERE" prefixOverrides="AND |OR">
+		
+		</trim>
+	</select>
+	
+	
+	
+	<insert id="addMember" parameterType="Member">
+		insert into tb_member
+		(
+			 m_id
+			,m_pw
+			,m_name
+			,m_level
+			,m_email
+			,m_addr
+			,m_reg_date
+		)values(
+			 #{memberId}
+			,#{memberPw}
+			,#{memberName}
+			,#{memberLevel}
+			,#{memberEmail}
+			,#{memberAddr}
+			,CURDATE()
+		);
+	</insert>
+	
+	<select id="getMemberLevelList" resultType="MemberLevel">
+		SELECT 
+			l.level_num AS levelNum
+			, l.level_name AS levelName
+		FROM 
+			tb_member_level AS l
+	</select>
+	
+	
+	<select id="getMemberListBySearchKey" parameterType="String" resultMap="memberResultMap">
+		SELECT 
+			 m_id
+			,m_pw 
+			,m_name 
+			,m_level 
+			,m_email 
+			,m_addr 
+			,m_reg_date 
+		FROM
+			tb_member AS m
+		<trim prefix="WHERE" prefixOverrides="AND |OR">
+			<if test="searchValue != null and searchValue != ''.toString()">
+				${searchKey} LIKE CONCAT ('%', #{searchValue}, '%');
+				/* $은 statement로 즉시,실행해준다, #은 preparestatement로 준비상태로 실행해준다. */
+			</if>
+		</trim>
+	</select>
+	
+	<select id="getMemberbyMemberId" parameterType="String" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM 
+			tb_member AS m
+		WHERE 
+			m.m_id=#{memberId};				
+	</select>
+	
+	
+	<select id="getMemberList" resultType="Member">
+		SELECT 
+			m.m_id AS memberId
+			,m.m_pw AS memberPw
+			,m.m_name AS memberName
+			,m.m_level AS memberLevel
+			,m.m_email AS memberEmail
+			,m.m_addr AS memberAddr
+			,m.m_reg_date AS memberRegDate
+		FROM
+			tb_member AS m;
+	</select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:fragment="headFragment1">
+	<meta charset="UTF-8">	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+	<script type="text/javascript" th:src="@{/js/jquery-3.6.0.min.js}"></script>
+	<!-- 화면구현 페이지 개발자마다 title 삽입 공간 -->
+	<th:block layout:fragment="customTitle"></th:block>
+	<!-- 화면구현 페이지 개발자마다 css 삽입 공간 -->
+	<th:block layout:fragment="customCss"></th:block>
+	<!-- 화면구현 페이지 개발자마다 js 삽입 공간 -->
+	<th:block layout:fragment="customJs"></th:block>
+	<!-- 화면구현 페이지 개발자마다 style 삽입 공간 -->
+	<th:block layout:fragment="customStyle"></th:block>
+</head>
+
+<head th:fragment="headFragment2">
+	<meta charset="UTF-8">	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+	<!-- 화면구현 페이지 개발자마다 title 삽입 공간 -->
+	<th:block layout:fragment="customTitle"></th:block>
+	<!-- 화면구현 페이지 개발자마다 css 삽입 공간 -->
+	<th:block layout:fragment="customCss"></th:block>
+	<!-- 화면구현 페이지 개발자마다 js 삽입 공간 -->
+	<th:block layout:fragment="customJs"></th:block>
+</head>
+
+</html>

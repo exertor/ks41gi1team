@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="@{layout/default}">
+	<th:block layout:fragment="customTitle">
+		<title th:text="${title}"></title>
+	</th:block>
+	
+	<th:block layout:fragment="customJs">
+		<script>
+		$(function(){
+			
+			$(document).on('click', '#addMemberBtn', function(){
+				var submitCheck = true;
+				
+				var inputObj = $('#addMemberForm').find('input');
+				
+				$.each(inputObj, function(){
+					var inputData = $(this).val();
+					var input = $(this).attr('id');
+					var labelText = $('label[for=' + inputId +']').text();
+					
+					if(typeof memberId == 'undefined' || memberId == null || memberId != ''){	
+						alert(labelText + '입력해주세요');
+						$(this).focus();
+						
+						console.log(inputData);
+						submitCheck = false;
+						return false;
+					}	
+				});
+				
+				console.log(inputObj);
+				
+				if(submitCheck)$('#addMemberForm').submit();
+			});
+			
+			$('#btn').click(function(){
+				
+				var memberId = $('#memberId').val();
+				
+				if(typeof memberId != 'undefined' && memberId != null && memberId != ''){	
+					//ajax 호출
+					var request =$.ajax({
+				        url: '/member/idCheck',
+				        method : 'POST',
+				        data : {'memberId' : memberId},
+				        dataType:'json'
+					});
+					request.done(function(data){
+						console.log(data, '콜백 데이터');
+						// 중복여부 체크(true: 중복, false: 등록가능)
+						var idConfirm = data;
+						
+						// 중복일 경우 알림창 '중복된 아이디입니다.'
+						if(idConfirm){
+							alert('중복된 아이디입니다.');
+							$('#addMemberForm input').not('#memberId').prop('disabled', true);
+							$('#addMemberForm select').prop('disabled', true);
+							$('#addMemberForm button').not('#btn').prop('disabled', true);
+						}else{
+							alert('등록이 가능한 아이디입니다.');
+							$('#addMemberForm input').prop('disabled', false);
+							$('#addMemberForm select').prop('disabled', false);
+							$('#addMemberForm button').prop('disabled', false);
+						}
+						// 중복이 아닐 경우 disabled 해제
+					});
+					request.fail(function(jqXHR, textStatus){
+						alert("Request failed: " + textStatus);	
+					});
+				}else{
+					alert('아이디를 입력해주세요')
+					return false;
+				}
+			});
+		});
+		</script>
+	</th:block>
+	
+	<th:block layout:fragment="customStyle">
+		<style>
+			select{
+				width: 100%;
+			}
+		</style>
+	</th:block>	
+	
+	<th:block layout:fragment="customContents">
+		<form id="addMemberForm" th:action="@{/member/addMember}" method="post">
+		<table border="1">
+				<tr>
+					<td>
+						<label for="memberId">회원아이디</label>
+					</td>
+					<td>
+						<input type="text" id="memberId" name="memberId"/>
+					</td>
+					<td>
+						<button type="button" id="btn">중복확인</button>
+					</td>
+				</tr>
+				<tr>	
+					<td>
+						<label for="memberPw">회원비밀번호</label>
+					</td>
+					<td>
+						<input type="text" id="memberPw" name="memberPw" disabled="disabled"/>
+					</td>
+				</tr>
+				<tr>	
+					<td>회원권한</td>
+					<td>
+						<select name="memberLevel" disabled="disabled">
+							<th:block th:if="${not #lists.isEmpty(memberLevelList)}"
+									  th:each="l : ${memberLevelList}">
+								<option th:value="${l.levelNum}" th:text="${l.levelName}">
+									[[${l.levelName}]]
+								</option>
+							</th:block>
+							<th:block th:unless="${not #lists.isEmpty(memberLevelList)}">
+								<option>회원등급을 먼저 등록해주세요.</option>
+							</th:block>
+						<!-- 	<option value="1">관리자</option>
+							<option value="2">판매자</option>
+							<option value="3">구매자</option>
+							<option value="4">회원</option> -->
+						</select>
+					</td>
+				</tr>
+				<tr>	
+					<td>
+						<label for="memberName">회원이름</label>
+					</td>
+					<td>
+						<input type="text" id="memberName" name="memberName" disabled="disabled"/>
+					</td>
+				</tr>
+				<tr>	
+					<td>
+						<label for="memberEmail">회원이메일</label>
+					</td>
+					<td>
+						<input type="text" id="memberEmail" name="memberEmail" disabled="disabled"/>
+					</td>
+				</tr>
+				<tr>	
+					<td>
+						<label for="memberAddr">회원주소</label>
+					</td>
+					<td>
+						<input type="text" id="memberAddr" name="memberAddr" disabled="disabled"/>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<button type="submit" disabled="disabled">입력완료</button>
+					</td>	
+				</tr>
+		</table>
+		</form>
+	</th:block>
+</html>
